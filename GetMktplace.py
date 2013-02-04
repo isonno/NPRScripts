@@ -1,18 +1,16 @@
+#!/usr/bin/python
+#
+# For Python 2.7
 #
 # Fish the last four MarketPlace shows, and some weekly shows
-# off NPR onto my USB drive "E:"
+# off NPR onto my USB drive "DestDrive"
 #
 import urllib, os, sys, datetime
 import sgmllib, htmllib, formatter, re
 
 DestDrive = "G:"
 
-# Download a weekly NPR show.
-# The podcasts are stored at a link like this (e.g., CarTalk):
-#  http://www.npr.org/rss/podcast/podcast_detail.php?siteId=9911203
-# where the number changes by show.  On that page, you look for a link like this:
-#  http://public.npr.org/anon.npr-podcasts/podcast/510208/145572190/npr_145572190.mp3?dl=1
-# with the MP3 file.
+# Walk through a web site, collecting anchors matching "hrefRegex"
 
 class NPRshowParser( htmllib.HTMLParser ):
 	def __init__(self, hrefRegex):
@@ -25,6 +23,7 @@ class NPRshowParser( htmllib.HTMLParser ):
 		if (self.hrefRE.search( d['href'] )):
 			self.resultURL = d['href']
 
+# Use an HTML parser to fish the MP3s out of the NPR web site.
 def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
 	nprParser.feed( urlstream.read() )
 	urlstream.close()
@@ -41,6 +40,13 @@ def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
 	else:
 		print "Unable to get %s for %s" % (showName, lastSunStr)
 
+# Download a weekly NPR show.
+# The podcasts are stored at a link like this (e.g., CarTalk):
+#  http://www.npr.org/rss/podcast/podcast_detail.php?siteId=9911203
+# where the number changes by show.  On that page, you look for a link like this:
+#  http://public.npr.org/anon.npr-podcasts/podcast/510208/145572190/npr_145572190.mp3?dl=1
+# with the MP3 file.
+
 def getNPRShow( podCastID, thumbPathStr, showName ):
 	nprParser = NPRshowParser( ".*npr-podcasts.*" )
 	urlstream = urllib.urlopen( "http://www.npr.org/rss/podcast/podcast_detail.php?siteId=%s" % podCastID )
@@ -51,7 +57,8 @@ def getTAM( thumbPathStr ):
 	urlstream = urllib.urlopen( "http://thisamericanlife.org/" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
 
-# Get the last four (numDaysToGet) episodes of Marketplace
+# Get the last four (numDaysToGet) episodes of Marketplace.  The MP3
+# location is computed directly from the date.
 def getMarketPlace():
 	def genurl(d):
 		urlStr="http://download.publicradio.org/podcast/marketplace/pm/%4d/%02d/%02d/marketplace_podcast_%4d%02d%02d_64.mp3"
@@ -83,7 +90,10 @@ getNPRShow( "9911203", '\\CARTALK\\CT_%s.mp3', "Car Talk" )
 getNPRShow( "5183214", '\\WW\\WW_%s.mp3', "Wait Wait" )
 getTAM( '\\TAM\\TAM_%s.mp3' )
 
+# Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
+
+# This link has segment-by-segment breakdowns of Science Friday
 # http://www.sciencefriday.com/audio/scifriaudio.xml
 
 getMarketPlace()
