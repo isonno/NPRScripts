@@ -8,7 +8,10 @@
 import urllib, os, sys, datetime
 import sgmllib, htmllib, formatter, re
 
-DestDrive = "G:"
+if sys.platform == "darwin":
+        DestDrive = "/Volumes/AUDIO"
+else:
+        DestDrive = "G:"
 
 # Walk through a web site, collecting anchors matching "hrefRegex"
 
@@ -30,7 +33,7 @@ def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
 
 	# Find last Sunday's date in Mmm_dd format
 	lastSunStr = (datetime.date.today() - datetime.timedelta( datetime.date.today().weekday()+2 )).strftime("%b_%d")
-	ctFilePath = DestDrive + thumbPathStr % lastSunStr
+	ctFilePath = DestDrive + os.path.normpath(thumbPathStr % lastSunStr)
 	if (os.path.exists( ctFilePath )):
 		print "Already have %s for %s" % (showName, lastSunStr)
 	elif (nprParser.resultURL):
@@ -64,7 +67,7 @@ def getMarketPlace():
 		urlStr="http://download.publicradio.org/podcast/marketplace/pm/%4d/%02d/%02d/marketplace_podcast_%4d%02d%02d_64.mp3"
 		return urlStr % (d.year, d.month, d.day, d.year, d.month, d.day )
 
-	DestFolder = DestDrive + "\\MKTPLC\\"
+	DestFolder = DestDrive + os.path.normpath("/MTPLC") + os.path.sep
 	numDaysToGet = 4
 
 	os.chdir(DestFolder)
@@ -83,12 +86,12 @@ def getMarketPlace():
 		showMP3 = urllib.urlopen(showurl).read()
 		file( DestFolder + "MKT_%02d.mp3" % d.day, 'wb' ).write(showMP3)
 		
-	os.chdir("D:\\")    # So USB key isn't locked.
+	os.chdir(os.path.normpath("/"))    # So USB key isn't locked.
 
 # Weekly shows
-getNPRShow( "9911203", '\\CARTALK\\CT_%s.mp3', "Car Talk" )
-getNPRShow( "5183214", '\\WW\\WW_%s.mp3', "Wait Wait" )
-getTAM( '\\TAM\\TAM_%s.mp3' )
+getNPRShow( "9911203", '/CARTALK/CT_%s.mp3', "Car Talk" )
+getNPRShow( "5183214", '/WW/WW_%s.mp3', "Wait Wait" )
+getTAM( '/TAM/TAM_%s.mp3' )
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
