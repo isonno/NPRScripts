@@ -67,7 +67,7 @@ def getMarketPlace():
 		urlStr="http://download.publicradio.org/podcast/marketplace/pm/%4d/%02d/%02d/marketplace_podcast_%4d%02d%02d_64.mp3"
 		return urlStr % (d.year, d.month, d.day, d.year, d.month, d.day )
 
-	DestFolder = DestDrive + os.path.normpath("/MTPLC") + os.path.sep
+	DestFolder = DestDrive + os.path.normpath("/MKTPLC") + os.path.sep
 	numDaysToGet = 4
 
 	os.chdir(DestFolder)
@@ -88,10 +88,24 @@ def getMarketPlace():
 		
 	os.chdir(os.path.normpath("/"))    # So USB key isn't locked.
 
+def clean():
+	folders = ["ATC", "CARTALK", "FAIR", "MKTPLC", "SCIFRI", "TAM", "TED", "WW"]
+	for fold in folders:
+		path = DestDrive + os.path.sep + fold + os.path.sep
+		print "Cleaning %s..." % path
+		[os.remove(path + f) for f in os.listdir( path )]
+
 # Weekly shows
-getNPRShow( "9911203", '/CARTALK/CT_%s.mp3', "Car Talk" )
-getNPRShow( "5183214", '/WW/WW_%s.mp3', "Wait Wait" )
-getTAM( '/TAM/TAM_%s.mp3' )
+def getNPRShows():
+	getNPRShow( "9911203", '/CARTALK/CT_%s.mp3', "Car Talk" )
+	getNPRShow( "5183214", '/WW/WW_%s.mp3', "Wait Wait" )
+	getTAM( '/TAM/TAM_%s.mp3' )
+	getMarketPlace()
+
+if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
+	clean()
+else:
+	getNPRShows()	
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
@@ -99,4 +113,3 @@ getTAM( '/TAM/TAM_%s.mp3' )
 # This link has segment-by-segment breakdowns of Science Friday
 # http://www.sciencefriday.com/audio/scifriaudio.xml
 
-getMarketPlace()
