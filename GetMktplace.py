@@ -5,13 +5,32 @@
 # Fish the last four MarketPlace shows, and some weekly shows
 # off NPR onto my USB drive "DestDrive"
 #
-import urllib, os, sys, datetime
+import urllib, os, sys, datetime, string
 import sgmllib, htmllib, formatter, re
 
+def getWindowsDrives():		# http://stackoverflow.com/questions/827371
+	from ctypes import windll
+	drives = []
+	bitmask = windll.kernel32.GetLogicalDrives()
+	for letter in string.uppercase:
+		if bitmask & 1:
+			drives.append(letter + ":")
+		bitmask >>= 1
+
+	return drives
+
+DestDrive = None
 if sys.platform == "darwin":
-        DestDrive = "/Volumes/AUDIO"
+	DestDrive = "/Volumes/AUDIO"
 else:
-        DestDrive = "G:"
+	winDrives = getWindowsDrives()[1:]	# Skip the C: drive
+	for d in winDrives:
+		if (os.path.exists( d + os.path.sep + "MKTPLC" )):
+			DestDrive = d
+			break
+	if (not DestDrive):
+		print "NPR Thumb drive missing?  It must have a MKTPLC folder"
+		sys.exit(-1)
 
 # Walk through a web site, collecting anchors matching "hrefRegex"
 
