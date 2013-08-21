@@ -108,7 +108,7 @@ def getMarketPlace():
 	os.chdir(os.path.normpath("/"))    # So USB key isn't locked.
 
 def clean():
-	folders = ["ATC", "CARTALK", "FAIR", "MKTPLC", "SCIFRI", "TAM", "TED", "WW"]
+	folders = ["ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "SCIFRI", "TAM", "TED", "WW"]
 	for fold in folders:
 		path = DestDrive + os.path.sep + fold + os.path.sep
 		print "Cleaning %s..." % path
@@ -132,3 +132,5 @@ else:
 # This link has segment-by-segment breakdowns of Science Friday
 # http://www.sciencefriday.com/audio/scifriaudio.xml
 
+# Freakanomics Radio:
+# http://feeds.feedburner.com/freakonomicsradio
