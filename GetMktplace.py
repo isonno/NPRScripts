@@ -111,8 +111,12 @@ def clean():
 	folders = ["ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "SCIFRI", "TAM", "TED", "WW"]
 	for fold in folders:
 		path = DestDrive + os.path.sep + fold + os.path.sep
-		print "Cleaning %s..." % path
-		[os.remove(path + f) for f in os.listdir( path )]
+		if not os.path.exists( path ):
+			print "Creating folder %s..." % path
+			os.mkdir( path )
+		else:
+			print "Cleaning %s..." % path
+			[os.remove(path + f) for f in os.listdir( path )]
 
 # Weekly shows
 def getNPRShows():
