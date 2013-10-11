@@ -138,3 +138,11 @@ else:
 
 # Freakanomics Radio:
 # http://feeds.feedburner.com/freakonomicsradio
+
+# Planet Money podcasts look like this:
+#  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131009_blog_pmoney.mp3?dl=1
+#  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131004_blog_pmoney.mp3?dl=1
+#  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131002_blog_pmoney.mp3?dl=1
+#  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/09/20130927_blog_pmpod.mp3?dl=1
+#  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/09/20130925_blog_pmoney.mp3?dl=1
+# So you need to grab most recent Wed & Fri.
