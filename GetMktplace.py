@@ -45,13 +45,17 @@ class NPRshowParser( htmllib.HTMLParser ):
 		if (self.hrefRE.search( d['href'] )):
 			self.resultURL = d['href']
 
+# Return the date of the last specified weekday (0=Mon, 1=Tue...6=Sun)
+def lastNday(n):
+	return (datetime.date.today() - datetime.timedelta( datetime.date.today().weekday()+(7-n)%7 ))
+
 # Use an HTML parser to fish the MP3s out of the NPR web site.
 def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
 	nprParser.feed( urlstream.read() )
 	urlstream.close()
 
-	# Find last Sunday's date in Mmm_dd format
-	lastSunStr = (datetime.date.today() - datetime.timedelta( datetime.date.today().weekday()+2 )).strftime("%b_%d")
+	# Find last Saturday's date in Mmm_dd format
+	lastSunStr = lastNday(5).strftime("%b_%d")
 	ctFilePath = DestDrive + os.path.normpath(thumbPathStr % lastSunStr)
 	if (os.path.exists( ctFilePath )):
 		print "Already have %s for %s" % (showName, lastSunStr)
@@ -78,6 +82,14 @@ def getTAM( thumbPathStr ):
 	nprParser = NPRshowParser( ".*[.]mp3$" )
 	urlstream = urllib.urlopen( "http://thisamericanlife.org/" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
+
+def getPlanetMoney( lastCount, thumbPath ):
+	# http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131004_blog_pmoney.mp3?dl=1
+	moneyDay = lastNday( lastCount )
+	moneyURL=moneyDay.strftime("http://pd.npr.org/anon.npr-mp3/npr/blog/%Y/%m/%Y%m%d_blog_pmoney.mp3?dl=1")
+	print "Getting Planet Money for " + moneyDay.strftime("%b %d")
+	moneyMP3=urllib.urlopen( moneyURL ).read()
+	file( DestDrive + os.path.normpath( thumbPath % (moneyDay.strftime("money_%b_%d"))), 'wb').write( moneyMP3 )
 
 # Get the last four (numDaysToGet) episodes of Marketplace.  The MP3
 # location is computed directly from the date.
@@ -124,6 +136,10 @@ def getNPRShows():
 	getNPRShow( "5183214", '/WW/WW_%s.mp3', "Wait Wait" )
 	getTAM( '/TAM/TAM_%s.mp3' )
 	getMarketPlace()
+	getPlanetMoney( 2, "/ATC/Money_%s.mp3" )
+	getPlanetMoney( 4, "/ATC/Money_%s.mp3" )
+
+
 
 if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
 	clean()
@@ -145,4 +161,5 @@ else:
 #  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131002_blog_pmoney.mp3?dl=1
 #  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/09/20130927_blog_pmpod.mp3?dl=1
 #  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/09/20130925_blog_pmoney.mp3?dl=1
+# http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131025_blog_pmoney.mp3?dl=1
 # So you need to grab most recent Wed & Fri.
