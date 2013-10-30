@@ -91,8 +91,11 @@ def getPlanetMoney( lastCount, thumbPath ):
 	moneyDay = lastNday( lastCount )
 	moneyURL=moneyDay.strftime("http://pd.npr.org/anon.npr-mp3/npr/blog/%Y/%m/%Y%m%d_blog_pmoney.mp3?dl=1")
 	print "Getting Planet Money for " + moneyDay.strftime("%b %d")
-	moneyMP3=urllib.urlopen( moneyURL ).read()
-	file( DestDrive + os.path.normpath( thumbPath % (moneyDay.strftime("money_%b_%d"))), 'wb').write( moneyMP3 )
+	moneyMP3=urllib.urlopen( moneyURL )
+	if (moneyMP3.getcode() == 200):
+		file( DestDrive + os.path.normpath( thumbPath % (moneyDay.strftime("money_%b_%d"))), 'wb').write( moneyMP3.read() )
+	else:
+		print "Error %d loading %s" % (moneyMP3.getcode(), moneyURL)
 
 # Get the last four (numDaysToGet) episodes of Marketplace.  The MP3
 # location is computed directly from the date.
