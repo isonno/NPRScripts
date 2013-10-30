@@ -84,7 +84,10 @@ def getTAM( thumbPathStr ):
 	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
 
 def getPlanetMoney( lastCount, thumbPath ):
+	# Sample URL
 	# http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131004_blog_pmoney.mp3?dl=1
+	# Note the Planet Money guys get slopply.  Sometimes the date in the filename portion
+	# of the string is off, sometimes they use "pmpod" instead of "pmoney".
 	moneyDay = lastNday( lastCount )
 	moneyURL=moneyDay.strftime("http://pd.npr.org/anon.npr-mp3/npr/blog/%Y/%m/%Y%m%d_blog_pmoney.mp3?dl=1")
 	print "Getting Planet Money for " + moneyDay.strftime("%b %d")
@@ -138,8 +141,6 @@ def getNPRShows():
 	getMarketPlace()
 	getPlanetMoney( 2, "/ATC/Money_%s.mp3" )
 	getPlanetMoney( 4, "/ATC/Money_%s.mp3" )
-
-
 
 if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
 	clean()
