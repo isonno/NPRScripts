@@ -8,4 +8,5 @@ On the Mac, the thumb drive should have the volume name `AUDIO`.  On Windows, it
 (except the first one, typically `C:`) for a top level folder called `MKTPLC`.
 
 Currently it grabs the weekly shows Car Talk, Wait Wait and This American Life, as well as the last four weekday
-shows of Marketplace.  Marketplace was the first show I wrote the script for, hence the name "GetMktplace".
+shows of Marketplace and the last two episodes of Planet Money.  Marketplace was the first show I wrote the script for,
+hence the name "GetMktplace".
