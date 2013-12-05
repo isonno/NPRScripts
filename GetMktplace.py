@@ -83,6 +83,12 @@ def getTAM( thumbPathStr ):
 	urlstream = urllib.urlopen( "http://thisamericanlife.org/" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
 
+def getTAMepisode( showNumber ):
+	print "# Downloading TAM episode #%s" % showNumber
+	tamURL = "http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/%s.mp3"
+	mp3data = urllib.urlopen( tamURL % showNumber ).read()
+	file( DestDrive + os.sep + "TAM"+ os.sep + "TAM_%s.mp3" % showNumber, 'wb' ).write( mp3data )
+
 def getPlanetMoney( lastCount, thumbPath ):
 	def moneyDownload( moneyDay, key ):
 		moneyURL=moneyDay.strftime("http://pd.npr.org/anon.npr-mp3/npr/blog/%Y/%m/%Y%m%d_blog_" + key + ".mp3?dl=1")
@@ -155,6 +161,8 @@ def getNPRShows():
 
 if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
 	clean()
+elif (len(sys.argv) > 2 and sys.argv[1] == "tam"):
+    getTAMepisode( sys.argv[2] )
 else:
 	getNPRShows()	
 
