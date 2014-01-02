@@ -103,7 +103,7 @@ def getPlanetMoney( lastCount, thumbPath ):
 
 	# Sample URL
 	# http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131004_blog_pmoney.mp3?dl=1
-	# Note the Planet Money guys get slopply.  Sometimes the date in the filename portion
+	# Note the Planet Money guys get sloppy.  Sometimes the date in the filename portion
 	# of the string is off, sometimes they use "pmpod" instead of "pmoney".
 	
 	if (not moneyDownload( lastNday( lastCount ), "pmoney" )):
