@@ -45,6 +45,14 @@ class NPRshowParser( htmllib.HTMLParser ):
 		if (self.hrefRE.search( d['href'] )):
 			self.resultURL = d['href']
 
+	# Freakanomics uses an XML file
+	def start_enclosure( self, attrs ):
+		# for Freakanomics
+		# only grab the first one for now; later can search for date
+		d = dict(attrs)
+		if not self.resultURL and (self.hrefRE.search( d['url'] )):
+			self.resultURL = d['url']
+
 # Return the date of the last specified weekday (0=Mon, 1=Tue...6=Sun)
 def lastNday(n):
 	return (datetime.date.today() - datetime.timedelta( datetime.date.today().weekday()+(7-n)%7 ))
@@ -82,6 +90,14 @@ def getTAM( thumbPathStr ):
 	nprParser = NPRshowParser( ".*[.]mp3$" )
 	urlstream = urllib.urlopen( "http://thisamericanlife.org/" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
+
+def getFreak( thumbPathStr ):
+	# Can pass the date at some point in the future.
+	# MP3 URL ends with ".../freakonomics_podcastMMDDYY.mp3"
+	# For now grab the first in the file (most recent)
+	nprParser = NPRshowParser( ".*[.]mp3$" )
+	urlstream = urllib.urlopen( "http://feeds.feedburner.com/freakonomicsradio" )
+	processNPRShow( nprParser, urlstream, thumbPathStr, "Freakanomics Radio" )
 
 def getTAMepisode( showNumber ):
 	print "# Downloading TAM episode #%s" % showNumber
@@ -156,6 +172,7 @@ def getNPRShows():
 	getNPRShow( "5183214", '/WW/WW_%s.mp3', "Wait Wait" )
 	getTAM( '/TAM/TAM_%s.mp3' )
 	getMarketPlace()
+	getFreak( '/FNR/FNR_%s.mp3' )
 	getPlanetMoney( 2, "/ATC/Money_%s.mp3" )
 	getPlanetMoney( 4, "/ATC/Money_%s.mp3" )
 
@@ -164,7 +181,7 @@ if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
 elif (len(sys.argv) > 2 and sys.argv[1] == "tam"):
     getTAMepisode( sys.argv[2] )
 else:
-	getNPRShows()	
+	getNPRShows()
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
