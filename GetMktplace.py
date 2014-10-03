@@ -122,17 +122,17 @@ def getPlanetMoney( lastCount, thumbPath ):
 	# Note the Planet Money guys get sloppy.  Sometimes the date in the filename portion
 	# of the string is off, sometimes they use "blog_pmpod" or "specials_pmoney"
 	# instead of "blog_pmoney".
-	
+
 	if (not moneyDownload( lastNday( lastCount ), "pmoney" )):
 		print "Trying pmpod download..."
 		moneyDownload( lastNday( lastCount ), "pmpod" )
-		
+
 
 # Get the last four (numDaysToGet) episodes of Marketplace.  The MP3
 # location is computed directly from the date.
 def getMarketPlace():
 	def genurl(d):
-		urlStr="http://download.publicradio.org/podcast/marketplace/pm/%4d/%02d/%02d/marketplace_podcast_%4d%02d%02d_64.mp3"
+		urlStr="http://www.podtrac.com/pts/redirect.mp3/download.publicradio.org/podcast/marketplace/pm/%4d/%02d/%02d/pm_%4d%02d%02d_pod_64.mp3"
 		return urlStr % (d.year, d.month, d.day, d.year, d.month, d.day )
 
 	DestFolder = DestDrive + os.path.normpath("/MKTPLC") + os.path.sep
@@ -153,7 +153,7 @@ def getMarketPlace():
 		showurl = genurl(d)
 		showMP3 = urllib.urlopen(showurl).read()
 		file( DestFolder + "MKT_%02d.mp3" % d.day, 'wb' ).write(showMP3)
-		
+
 	os.chdir(os.path.normpath("/"))    # So USB key isn't locked.
 
 def clean():
