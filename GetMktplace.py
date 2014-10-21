@@ -182,8 +182,7 @@ if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
 elif (len(sys.argv) > 2 and sys.argv[1] == "tam"):
     getTAMepisode( sys.argv[2] )
 else:
-##	getNPRShows()
-    getTAM('/TAM/TAM_%s.mp3')
+	getNPRShows()
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
