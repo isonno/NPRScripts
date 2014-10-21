@@ -42,7 +42,7 @@ class NPRshowParser( htmllib.HTMLParser ):
 
 	def start_a( self, attrs ):
 		d = dict(attrs)
-		if (self.hrefRE.search( d['href'] )):
+		if (d.has_key('href') and self.hrefRE.search( d['href'] )):
 			self.resultURL = d['href']
 
 	# Freakanomics uses an XML file
@@ -182,7 +182,8 @@ if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
 elif (len(sys.argv) > 2 and sys.argv[1] == "tam"):
     getTAMepisode( sys.argv[2] )
 else:
-	getNPRShows()
+##	getNPRShows()
+    getTAM('/TAM/TAM_%s.mp3')
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
