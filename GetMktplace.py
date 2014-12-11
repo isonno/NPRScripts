@@ -193,6 +193,18 @@ else:
 # Freakanomics Radio:
 # http://feeds.feedburner.com/freakonomicsradio
 
+# Serial Podcast
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1417670735/serial-s01-e10.mp3 (current)
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/serial-s01-e01_0.mp3 (past)
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/serial-s01-e02.mp3
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/serial-s01-e03.mp3
+# (magic number delta 6 to 7 is 599877; seconds in a week is 604800 so it's a posting timestamp)
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1414645971/serial-s01-e06.mp3
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1415245848/serial-s01-e07.mp3
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1415858152/serial-s01-e08.mp3
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1416455440/serial-s01-e09.mp3
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1417670735/serial-s01-e10.mp3
+
 # Planet Money podcasts look like this:
 #  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131009_blog_pmoney.mp3?dl=1
 #  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131004_blog_pmoney.mp3?dl=1
