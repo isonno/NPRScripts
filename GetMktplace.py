@@ -37,6 +37,7 @@ else:
 class NPRshowParser( htmllib.HTMLParser ):
 	def __init__(self, hrefRegex):
 		self.resultURL = None
+		self.urlList = []
 		self.hrefRE = re.compile( hrefRegex )
 		htmllib.HTMLParser.__init__( self, formatter.NullFormatter() )
 
@@ -44,6 +45,13 @@ class NPRshowParser( htmllib.HTMLParser ):
 		d = dict(attrs)
 		if (d.has_key('href') and self.hrefRE.search( d['href'] )):
 			self.resultURL = d['href']
+			self.urlList.append( d['href'] )
+
+		# This grabs archived shows from the Serial prodcast.
+		# the HREF above only gets the most recent in the page's
+		# default player.
+##		if (d.has_key('data-audio') and self.hrefRE.search( d['data-audio'])):
+##			print "Archived episode: " + d['data-audio']
 
 	# Freakanomics uses an XML file
 	def start_enclosure( self, attrs ):
@@ -91,6 +99,11 @@ def getTAM( thumbPathStr ):
 	urlstream = urllib.urlopen( "http://thisamericanlife.org/" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
 
+def getSerial( thumbPathStr ):
+	nprParser = NPRshowParser( ".*serial-s\d\d-e\d\d[.]mp3$" )
+	urlstream = urllib.urlopen( "http://serialpodcast.org/" )
+	processNPRShow( nprParser, urlstream, thumbPathStr, "Serial Podcast" )
+
 def getFreak( thumbPathStr ):
 	# Can pass the date at some point in the future.
 	# MP3 URL ends with ".../freakonomics_podcastMMDDYY.mp3"
@@ -106,27 +119,38 @@ def getTAMepisode( showNumber ):
 	file( DestDrive + os.sep + "TAM"+ os.sep + "TAM_%s.mp3" % showNumber, 'wb' ).write( mp3data )
 
 def getPlanetMoney( lastCount, thumbPath ):
-	def moneyDownload( moneyDay, key ):
-		moneyURL=moneyDay.strftime("http://pd.npr.org/anon.npr-mp3/npr/blog/%Y/%m/%Y%m%d_blog_" + key + ".mp3?dl=1")
-		print "Getting Planet Money (%s) for " % key + moneyDay.strftime("%b %d")
+
+	def moneyDownload( moneyURLs, moneyDay ):
+		# Search the list of Planet Money URLs for the show w/desired date
+		searchKey = re.compile(moneyDay.strftime( "%Y/%m/%Y%m%d"))
+		moneyURL = None
+		for url in moneyURLs:
+			if searchKey.search( url ):
+				moneyURL = url
+				break
+
+		if not moneyURL:
+			print "Can't find Planet Money for %s" % moneyDay.strftime("%b %d")
+			return False
+
 		moneyMP3=urllib.urlopen( moneyURL )
 		if (moneyMP3.getcode() == 200):
+			print "Getting Planet Money for %s" % moneyDay.strftime("%b %d")
 			file( DestDrive + os.path.normpath( thumbPath % (moneyDay.strftime("%b_%d"))), 'wb').write( moneyMP3.read() )
 			return True
 		else:
 			print "Error %d loading %s" % (moneyMP3.getcode(), moneyURL)
 			return False
 
-	# Sample URL
-	# http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131004_blog_pmoney.mp3?dl=1
-	# Note the Planet Money guys get sloppy.  Sometimes the date in the filename portion
-	# of the string is off, sometimes they use "blog_pmpod" or "specials_pmoney"
-	# instead of "blog_pmoney".
+	# Rather than try and guess the URLs, we look for Planet Money shows
+	# by date instead.
 
-	if (not moneyDownload( lastNday( lastCount ), "pmoney" )):
-		print "Trying pmpod download..."
-		moneyDownload( lastNday( lastCount ), "pmpod" )
+	nprParser = NPRshowParser( ".*[.]mp3[?]dl=1$" )
+	urlstream = urllib.urlopen( "http://www.npr.org/blogs/money/")
+	nprParser.feed( urlstream.read() )
+	urlstream.close()
 
+	moneyDownload( nprParser.urlList, lastNday( lastCount ) )
 
 # Get the last four (numDaysToGet) episodes of Marketplace.  The MP3
 # location is computed directly from the date.
@@ -172,10 +196,14 @@ def getNPRShows():
 	getNPRShow( "9911203", '/CARTALK/CT_%s.mp3', "Car Talk" )
 	getNPRShow( "5183214", '/WW/WW_%s.mp3', "Wait Wait" )
 	getTAM( '/TAM/TAM_%s.mp3' )
+	getSerial( '/TAM/Serial_%s.mp3' )
 	getMarketPlace()
 	getFreak( '/FNR/FNR_%s.mp3' )
+	getPlanetMoney( 1, "/ATC/Money_%s.mp3" )
 	getPlanetMoney( 2, "/ATC/Money_%s.mp3" )
+	getPlanetMoney( 3, "/ATC/Money_%s.mp3" )
 	getPlanetMoney( 4, "/ATC/Money_%s.mp3" )
+
 
 if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
 	clean()
@@ -197,13 +225,12 @@ else:
 # http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1417670735/serial-s01-e10.mp3 (current)
 # http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/serial-s01-e01_0.mp3 (past)
 # http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/serial-s01-e02.mp3
-# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/serial-s01-e03.mp3
-# (magic number delta 6 to 7 is 599877; seconds in a week is 604800 so it's a posting timestamp)
+# ...
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/serial-s01-e05.mp3
+# Magic number delta e06 to e07 is 599,877. The seconds in a week is 604,800 so it's a posting timestamp
 # http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1414645971/serial-s01-e06.mp3
-# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1415245848/serial-s01-e07.mp3
-# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1415858152/serial-s01-e08.mp3
-# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1416455440/serial-s01-e09.mp3
-# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1417670735/serial-s01-e10.mp3
+# ...
+# http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1417670735/serial-s01-e12.mp3
 
 # Planet Money podcasts look like this:
 #  http://pd.npr.org/anon.npr-mp3/npr/blog/2013/10/20131009_blog_pmoney.mp3?dl=1
