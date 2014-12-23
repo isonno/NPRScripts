@@ -196,7 +196,7 @@ def getNPRShows():
 	getNPRShow( "9911203", '/CARTALK/CT_%s.mp3', "Car Talk" )
 	getNPRShow( "5183214", '/WW/WW_%s.mp3', "Wait Wait" )
 	getTAM( '/TAM/TAM_%s.mp3' )
-	getSerial( '/TAM/Serial_%s.mp3' )
+##	getSerial( '/TAM/Serial_%s.mp3' )
 	getMarketPlace()
 	getFreak( '/FNR/FNR_%s.mp3' )
 	getPlanetMoney( 1, "/ATC/Money_%s.mp3" )
