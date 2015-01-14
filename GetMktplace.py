@@ -181,7 +181,7 @@ def getMarketPlace():
 	os.chdir(os.path.normpath("/"))    # So USB key isn't locked.
 
 def clean():
-	folders = ["ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "SCIFRI", "TAM", "TED", "WW"]
+	folders = ["ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "INVIS", "SCIFRI", "TAM", "TED", "WW"]
 	for fold in folders:
 		path = DestDrive + os.path.sep + fold + os.path.sep
 		if not os.path.exists( path ):
@@ -195,6 +195,7 @@ def clean():
 def getNPRShows():
 	getNPRShow( "9911203", '/CARTALK/CT_%s.mp3', "Car Talk" )
 	getNPRShow( "5183214", '/WW/WW_%s.mp3', "Wait Wait" )
+	getNPRShow( "370162154", '/INVIS/Invis_%s.mp3', "Invisibilia" )
 	getTAM( '/TAM/TAM_%s.mp3' )
 ##	getSerial( '/TAM/Serial_%s.mp3' )
 	getMarketPlace()
