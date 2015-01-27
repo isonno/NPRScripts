@@ -65,34 +65,44 @@ class NPRshowParser( htmllib.HTMLParser ):
 def lastNday(n):
 	return (datetime.date.today() - datetime.timedelta( datetime.date.today().weekday()+(7-n)%7 ))
 
-# Use an HTML parser to fish the MP3s out of the NPR web site.
-def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
-	nprParser.feed( urlstream.read() )
-	urlstream.close()
-
+# Download the URL
+def downloadNPRshow( mp3url, thumbPathStr, showName ):
 	# Find last Saturday's date in Mmm_dd format
 	lastSunStr = lastNday(5).strftime("%b_%d")
 	ctFilePath = DestDrive + os.path.normpath(thumbPathStr % lastSunStr)
 	if (os.path.exists( ctFilePath )):
 		print "Already have %s for %s" % (showName, lastSunStr)
-	elif (nprParser.resultURL):
-		ctShowMP3 = urllib.urlopen(nprParser.resultURL).read()
+	elif (mp3url):
+		ctShowMP3 = urllib.urlopen(mp3url).read()
 		print "Getting %s for %s" % (showName, lastSunStr)
 		file( ctFilePath, 'wb' ).write( ctShowMP3 )
 	else:
 		print "Unable to get %s for %s" % (showName, lastSunStr)
 
 # Download a weekly NPR show.
-# The podcasts are stored at a link like this (e.g., CarTalk):
-#  http://www.npr.org/rss/podcast/podcast_detail.php?siteId=9911203
+# The podcast home pages are stored at URLs like (e.g., CarTalk):
+#  http://www.npr.org/podcasts/510208 [/car_talk]
 # where the number changes by show.  On that page, you look for a link like this:
 #  http://public.npr.org/anon.npr-podcasts/podcast/510208/145572190/npr_145572190.mp3?dl=1
-# with the MP3 file.
+# with the MP3 file suffix.
+# NOTE:
+# As of Jan '15, the link is now buried in JavaScript,
+# so you can't use the HTML parser any more.
+# So we just search the raw HTML stream (incl the JavaScript) now.
 
 def getNPRShow( podCastID, thumbPathStr, showName ):
-	nprParser = NPRshowParser( ".*npr-podcasts.*" )
-	urlstream = urllib.urlopen( "http://www.npr.org/rss/podcast/podcast_detail.php?siteId=%s" % podCastID )
-	processNPRShow( nprParser, urlstream, thumbPathStr, showName )
+	podcastPage = urllib.urlopen( "http://www.npr.org/podcasts/%s" % podCastID ).read()
+	g = re.search( "(http://[\w.]+/anon.npr-podcasts.*[.]mp3)", podcastPage )
+	if (g):
+		downloadNPRshow( g.group(1), thumbPathStr, showName )
+	else:
+		print "Link for %s MP3 not found in podcast page" % showName
+
+# Use an HTML parser to fish the MP3s out of the NPR web site.
+def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
+	nprParser.feed( urlstream.read() )
+	urlstream.close()
+	downloadNPRshow( nprParser.resultURL, thumbPathStr, showName )
 
 def getTAM( thumbPathStr ):
 	nprParser = NPRshowParser( ".*[.]mp3$" )
@@ -193,9 +203,9 @@ def clean():
 
 # Weekly shows
 def getNPRShows():
-	getNPRShow( "9911203", '/CARTALK/CT_%s.mp3', "Car Talk" )
-	getNPRShow( "5183214", '/WW/WW_%s.mp3', "Wait Wait" )
-	getNPRShow( "370162154", '/INVIS/Invis_%s.mp3', "Invisibilia" )
+	getNPRShow( "510208", '/CARTALK/CT_%s.mp3', "Car Talk" )
+	getNPRShow( "344098539", '/WW/WW_%s.mp3', "Wait Wait" )
+	getNPRShow( "510307", '/INVIS/Invis_%s.mp3', "Invisibilia" )
 	getTAM( '/TAM/TAM_%s.mp3' )
 ##	getSerial( '/TAM/Serial_%s.mp3' )
 	getMarketPlace()
@@ -205,13 +215,15 @@ def getNPRShows():
 	getPlanetMoney( 3, "/ATC/Money_%s.mp3" )
 	getPlanetMoney( 4, "/ATC/Money_%s.mp3" )
 
+def main():
+	if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
+		clean()
+	elif (len(sys.argv) > 2 and sys.argv[1] == "tam"):
+		getTAMepisode( sys.argv[2] )
+	else:
+		getNPRShows()
 
-if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
-	clean()
-elif (len(sys.argv) > 2 and sys.argv[1] == "tam"):
-    getTAMepisode( sys.argv[2] )
-else:
-	getNPRShows()
+main()
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
