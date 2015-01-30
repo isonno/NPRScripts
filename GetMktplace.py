@@ -89,6 +89,13 @@ def downloadNPRshow( mp3url, thumbPathStr, showName ):
 # As of Jan '15, the link is now buried in JavaScript,
 # so you can't use the HTML parser any more.
 # So we just search the raw HTML stream (incl the JavaScript) now.
+#
+# Well, not quite.  The link is also in a <div> tag, like this:
+#  <div class="audio-player" 
+#    data-id="381440789"
+#    data-html5-url="http://podcastdownload.npr.org/anon.npr-podcasts/podcast/344098539/377296249/npr_377296249.mp3"
+#    [...] >
+# So we can fix the NPR parser to look for these DIV parameters.
 
 def getNPRShow( podCastID, thumbPathStr, showName ):
 	podcastPage = urllib.urlopen( "http://www.npr.org/podcasts/%s" % podCastID ).read()
