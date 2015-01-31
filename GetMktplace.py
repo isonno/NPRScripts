@@ -53,6 +53,14 @@ class NPRshowParser( htmllib.HTMLParser ):
 ##		if (d.has_key('data-audio') and self.hrefRE.search( d['data-audio'])):
 ##			print "Archived episode: " + d['data-audio']
 
+	# The new podcast site uses <div ... data-html5-url="..."  >
+	def start_div( self, attrs ):
+		d = dict(attrs)
+		urlkey = 'data-html5-url'
+		if (d.has_key(urlkey) and self.hrefRE.search( d[urlkey] )):
+			self.urlList.append( d[urlkey] )
+			self.resultURL = self.urlList[0]
+
 	# Freakanomics uses an XML file
 	def start_enclosure( self, attrs ):
 		# for Freakanomics
@@ -68,13 +76,15 @@ def lastNday(n):
 # Download the URL
 def downloadNPRshow( mp3url, thumbPathStr, showName ):
 	# Find last Saturday's date in Mmm_dd format
+	g = re.search("/([\w_.]+[.]mp3)$", mp3url)
+	mp3filename = " (filename: %s)" % g.group(1) if g else ""
 	lastSunStr = lastNday(5).strftime("%b_%d")
 	ctFilePath = DestDrive + os.path.normpath(thumbPathStr % lastSunStr)
 	if (os.path.exists( ctFilePath )):
 		print "Already have %s for %s" % (showName, lastSunStr)
 	elif (mp3url):
 		ctShowMP3 = urllib.urlopen(mp3url).read()
-		print "Getting %s for %s" % (showName, lastSunStr)
+		print "Getting %s for %s" % (showName, lastSunStr) + mp3filename
 		file( ctFilePath, 'wb' ).write( ctShowMP3 )
 	else:
 		print "Unable to get %s for %s" % (showName, lastSunStr)
@@ -89,21 +99,15 @@ def downloadNPRshow( mp3url, thumbPathStr, showName ):
 # As of Jan '15, the link is now buried in JavaScript,
 # so you can't use the HTML parser any more.
 # So we just search the raw HTML stream (incl the JavaScript) now.
-#
-# Well, not quite.  The link is also in a <div> tag, like this:
-#  <div class="audio-player" 
-#    data-id="381440789"
-#    data-html5-url="http://podcastdownload.npr.org/anon.npr-podcasts/podcast/344098539/377296249/npr_377296249.mp3"
-#    [...] >
-# So we can fix the NPR parser to look for these DIV parameters.
+# This version does that, but see below...
 
-def getNPRShow( podCastID, thumbPathStr, showName ):
-	podcastPage = urllib.urlopen( "http://www.npr.org/podcasts/%s" % podCastID ).read()
-	g = re.search( "(http://[\w.]+/anon.npr-podcasts.*[.]mp3)", podcastPage )
-	if (g):
-		downloadNPRshow( g.group(1), thumbPathStr, showName )
-	else:
-		print "Link for %s MP3 not found in podcast page" % showName
+##def getNPRShow1( podCastID, thumbPathStr, showName ):
+##	podcastPage = urllib.urlopen( "http://www.npr.org/podcasts/%s" % podCastID ).read()
+##	g = re.search( "(http://[\w.]+/anon.npr-podcasts[\w/-]*[.]mp3)", podcastPage )
+##	if (g):
+##		downloadNPRshow( g.group(1), thumbPathStr, showName )
+##	else:
+##		print "Link for %s MP3 not found in podcast page" % showName
 
 # Use an HTML parser to fish the MP3s out of the NPR web site.
 def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
@@ -111,13 +115,25 @@ def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
 	urlstream.close()
 	downloadNPRshow( nprParser.resultURL, thumbPathStr, showName )
 
+# Well, actually, it turns out the .mp3 links are also buried in <DIV> tags.
+#  <div class="audio-player" 
+#    data-id="381440789"
+#    data-html5-url="http://podcastdownload.npr.org/anon.npr-podcasts/podcast/344098539/377296249/npr_377296249.mp3"
+#    [...] >
+# So we can fix the NPR parser to look for these DIV parameters.
+
+def getNPRShow( podCastID, thumbPathStr, showName ):
+	nprParser = NPRshowParser( "http.*[.]mp3$" )
+	urlstream = urllib.urlopen( "http://www.npr.org/podcasts/%s" % podCastID )
+	processNPRShow( nprParser, urlstream, thumbPathStr, showName )
+
 def getTAM( thumbPathStr ):
-	nprParser = NPRshowParser( ".*[.]mp3$" )
+	nprParser = NPRshowParser( "http.*[.]mp3$" )
 	urlstream = urllib.urlopen( "http://thisamericanlife.org/" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
 
 def getSerial( thumbPathStr ):
-	nprParser = NPRshowParser( ".*serial-s\d\d-e\d\d[.]mp3$" )
+	nprParser = NPRshowParser( "http.*serial-s\d\d-e\d\d[.]mp3$" )
 	urlstream = urllib.urlopen( "http://serialpodcast.org/" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "Serial Podcast" )
 
@@ -125,7 +141,7 @@ def getFreak( thumbPathStr ):
 	# Can pass the date at some point in the future.
 	# MP3 URL ends with ".../freakonomics_podcastMMDDYY.mp3"
 	# For now grab the first in the file (most recent)
-	nprParser = NPRshowParser( ".*[.]mp3$" )
+	nprParser = NPRshowParser( "http.*[.]mp3$" )
 	urlstream = urllib.urlopen( "http://feeds.feedburner.com/freakonomicsradio" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "Freakanomics Radio" )
 
@@ -135,8 +151,11 @@ def getTAMepisode( showNumber ):
 	mp3data = urllib.urlopen( tamURL % showNumber ).read()
 	file( DestDrive + os.sep + "TAM"+ os.sep + "TAM_%s.mp3" % showNumber, 'wb' ).write( mp3data )
 
+#
+# Planet money & Marketplace happen multiple times a week,
+# so muck with them differently
+#
 def getPlanetMoney( lastCount, thumbPath ):
-
 	def moneyDownload( moneyURLs, moneyDay ):
 		# Search the list of Planet Money URLs for the show w/desired date
 		searchKey = re.compile(moneyDay.strftime( "%Y/%m/%Y%m%d"))
