@@ -73,6 +73,9 @@ class NPRshowParser( htmllib.HTMLParser ):
 def lastNday(n):
 	return (datetime.date.today() - datetime.timedelta( datetime.date.today().weekday()+(7-n)%7 ))
 
+def mp3FileExists(path):
+	return os.path.exists(path) and (os.path.getsize(path) > 0)
+
 # Download the URL
 def downloadNPRshow( mp3url, thumbPathStr, showName ):
 	# Find last Saturday's date in Mmm_dd format
@@ -80,7 +83,7 @@ def downloadNPRshow( mp3url, thumbPathStr, showName ):
 	mp3filename = " (filename: %s)" % g.group(1) if g else ""
 	lastSunStr = lastNday(5).strftime("%b_%d")
 	ctFilePath = DestDrive + os.path.normpath(thumbPathStr % lastSunStr)
-	if (os.path.exists( ctFilePath )):
+	if (mp3FileExists( ctFilePath )):
 		print "Already have %s for %s" % (showName, lastSunStr)
 	elif (mp3url):
 		ctShowMP3 = urllib.urlopen(mp3url).read()
@@ -160,19 +163,26 @@ def getPlanetMoney( lastCount, thumbPath ):
 		# Search the list of Planet Money URLs for the show w/desired date
 		searchKey = re.compile(moneyDay.strftime( "%Y/%m/%Y%m%d"))
 		moneyURL = None
+		moneyPath = DestDrive + os.path.normpath( thumbPath % (moneyDay.strftime("%b_%d")))
 		for url in moneyURLs:
 			if searchKey.search( url ):
 				moneyURL = url
 				break
 
+		moneyDateStr = moneyDay.strftime("%b %d")
+
 		if not moneyURL:
-			print "Can't find Planet Money for %s" % moneyDay.strftime("%b %d")
+			print "Can't find Planet Money for %s" % moneyDateStr
 			return False
+
+		if (mp3FileExists(moneyPath)):
+			print "Already have Planet Money for %s" % moneyDateStr
+			return True
 
 		moneyMP3=urllib.urlopen( moneyURL )
 		if (moneyMP3.getcode() == 200):
-			print "Getting Planet Money for %s" % moneyDay.strftime("%b %d")
-			file( DestDrive + os.path.normpath( thumbPath % (moneyDay.strftime("%b_%d"))), 'wb').write( moneyMP3.read() )
+			print "Getting Planet Money for %s" % moneyDateStr
+			file( moneyPath, 'wb').write( moneyMP3.read() )
 			return True
 		else:
 			print "Error %d loading %s" % (moneyMP3.getcode(), moneyURL)
@@ -200,8 +210,6 @@ def getMarketPlace():
 
 	os.chdir(DestFolder)
 
-	[os.remove(f) for f in os.listdir(DestFolder)]
-
 	weekendOffset = 0
 	for i in range(0, numDaysToGet):
 		d = datetime.date.today() - datetime.timedelta(i)
@@ -209,15 +217,19 @@ def getMarketPlace():
 		if (d.weekday() == 6):
 			weekendOffset += 2
 		d = d - datetime.timedelta(weekendOffset) # Skip weekends
-		print d.strftime("Getting Marketplace for %b %d, %Y...")
-		showurl = genurl(d)
-		showMP3 = urllib.urlopen(showurl).read()
-		file( DestFolder + "MKT_%02d.mp3" % d.day, 'wb' ).write(showMP3)
+		mktPath = DestFolder + "MKT_%02d.mp3" % d.day
+		if mp3FileExists(mktPath):
+			print d.strftime("Already have Marketplace for %b %d, %Y...")
+		else:
+			print d.strftime("Getting Marketplace for %b %d, %Y...")
+			showurl = genurl(d)
+			showMP3 = urllib.urlopen(showurl).read()
+			file( mktPath, 'wb' ).write(showMP3)
 
 	os.chdir(os.path.normpath("/"))    # So USB key isn't locked.
 
 def clean():
-	folders = ["ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "INVIS", "SCIFRI", "TAM", "TED", "WW"]
+	folders = ["ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "INVIS", "HT", "SCIFRI", "TAM", "TED", "WW"]
 	for fold in folders:
 		path = DestDrive + os.path.sep + fold + os.path.sep
 		if not os.path.exists( path ):
@@ -232,6 +244,7 @@ def getNPRShows():
 	getNPRShow( "510208", '/CARTALK/CT_%s.mp3', "Car Talk" )
 	getNPRShow( "344098539", '/WW/WW_%s.mp3', "Wait Wait" )
 	getNPRShow( "510307", '/INVIS/Invis_%s.mp3', "Invisibilia" )
+	getNPRShow( "510303", '/HT/HowTo_%s.mp3', "How To" )
 	getTAM( '/TAM/TAM_%s.mp3' )
 ##	getSerial( '/TAM/Serial_%s.mp3' )
 	getMarketPlace()
@@ -240,6 +253,7 @@ def getNPRShows():
 	getPlanetMoney( 2, "/ATC/Money_%s.mp3" )
 	getPlanetMoney( 3, "/ATC/Money_%s.mp3" )
 	getPlanetMoney( 4, "/ATC/Money_%s.mp3" )
+
 
 def main():
 	if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
