@@ -5,8 +5,8 @@
 # Fish the last four MarketPlace shows, and some weekly shows
 # off NPR onto my USB drive "DestDrive"
 #
-import urllib, os, sys, datetime, string
-import sgmllib, htmllib, formatter, re
+import urllib, os, sys, datetime, string, glob
+import sgmllib, htmllib, formatter, re, subprocess
 
 def getWindowsDrives():		# http://stackoverflow.com/questions/827371
 	from ctypes import windll
@@ -254,6 +254,20 @@ def getNPRShows():
 	getPlanetMoney( 3, "/ATC/Money_%s.mp3" )
 	getPlanetMoney( 4, "/ATC/Money_%s.mp3" )
 
+# The MP3 Player on my '11 Honda Insight gags on some of
+# the podcast MP3 files NPR distributes.  Re-encoding
+# them with ffmpeg works around the problem.
+def reEncodeShow(show):
+	path = DestDrive + os.sep + show + os.sep
+	files = glob.glob(path + "*.mp3")
+	try:
+		for f in files:
+			print "Re-encoding %s..." % f
+			subprocess.call(["ffmpeg", "-i", f, "-ac", "2", path+"tmp.mp3"])
+			os.remove(f)
+			os.rename(path+"tmp.mp3", f)
+	except OSError:
+		print "Unable to run ffmpeg"
 
 def main():
 	if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
@@ -264,6 +278,8 @@ def main():
 		getNPRShows()
 
 main()
+reEncodeShow("WW")
+reEncodeShow("HT")
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
