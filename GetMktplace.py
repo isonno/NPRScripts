@@ -243,10 +243,10 @@ def clean():
 def getNPRShows():
 	getNPRShow( "510208", '/CARTALK/CT_%s.mp3', "Car Talk" )
 	getNPRShow( "344098539", '/WW/WW_%s.mp3', "Wait Wait" )
-	getNPRShow( "510307", '/INVIS/Invis_%s.mp3', "Invisibilia" )
-	getNPRShow( "510303", '/HT/HowTo_%s.mp3', "How To" )
+##	getNPRShow( "510307", '/INVIS/Invis_%s.mp3', "Invisibilia" )  # Season ended
+##	getSerial( '/TAM/Serial_%s.mp3' )						# Season ended
+#	getNPRShow( "510303", '/HT/HowTo_%s.mp3', "How To" )	# Boring
 	getTAM( '/TAM/TAM_%s.mp3' )
-##	getSerial( '/TAM/Serial_%s.mp3' )
 	getMarketPlace()
 	getFreak( '/FNR/FNR_%s.mp3' )
 	getPlanetMoney( 1, "/ATC/Money_%s.mp3" )
@@ -276,10 +276,11 @@ def main():
 		getTAMepisode( sys.argv[2] )
 	else:
 		getNPRShows()
+		reEncodeShow("WW")
+		reEncodeShow("HT")
+
 
 main()
-reEncodeShow("WW")
-reEncodeShow("HT")
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
