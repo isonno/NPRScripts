@@ -119,7 +119,7 @@ def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
 	downloadNPRshow( nprParser.resultURL, thumbPathStr, showName )
 
 # Well, actually, it turns out the .mp3 links are also buried in <DIV> tags.
-#  <div class="audio-player" 
+#  <div class="audio-player"
 #    data-id="381440789"
 #    data-html5-url="http://podcastdownload.npr.org/anon.npr-podcasts/podcast/344098539/377296249/npr_377296249.mp3"
 #    [...] >
@@ -229,7 +229,7 @@ def getMarketPlace():
 	os.chdir(os.path.normpath("/"))    # So USB key isn't locked.
 
 def clean():
-	folders = ["ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "INVIS", "HT", "SCIFRI", "TAM", "TED", "WW"]
+	folders = ["99PI", "ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "INVIS", "HT", "SCIFRI", "TAM", "TED", "WW"]
 	for fold in folders:
 		path = DestDrive + os.path.sep + fold + os.path.sep
 		if not os.path.exists( path ):
