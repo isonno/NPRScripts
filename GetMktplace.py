@@ -5,7 +5,7 @@
 # Fish the last four MarketPlace shows, and some weekly shows
 # off NPR onto my USB drive "DestDrive"
 #
-import urllib, os, sys, datetime, string, glob
+import urllib2, os, sys, datetime, string, glob
 import sgmllib, htmllib, formatter, re, subprocess
 
 def getWindowsDrives():		# http://stackoverflow.com/questions/827371
@@ -43,6 +43,7 @@ class NPRshowParser( htmllib.HTMLParser ):
 
 	def start_a( self, attrs ):
 		d = dict(attrs)
+#		print d['href']
 		if (d.has_key('href') and self.hrefRE.search( d['href'] )):
 			self.resultURL = d['href']
 			self.urlList.append( d['href'] )
@@ -86,7 +87,7 @@ def downloadNPRshow( mp3url, thumbPathStr, showName ):
 	if (mp3FileExists( ctFilePath )):
 		print "Already have %s for %s" % (showName, lastSunStr)
 	elif (mp3url):
-		ctShowMP3 = urllib.urlopen(mp3url).read()
+		ctShowMP3 = urllib2.urlopen(mp3url).read()
 		print "Getting %s for %s" % (showName, lastSunStr) + mp3filename
 		file( ctFilePath, 'wb' ).write( ctShowMP3 )
 	else:
@@ -105,7 +106,7 @@ def downloadNPRshow( mp3url, thumbPathStr, showName ):
 # This version does that, but see below...
 
 ##def getNPRShow1( podCastID, thumbPathStr, showName ):
-##	podcastPage = urllib.urlopen( "http://www.npr.org/podcasts/%s" % podCastID ).read()
+##	podcastPage = urllib2.urlopen( "http://www.npr.org/podcasts/%s" % podCastID ).read()
 ##	g = re.search( "(http://[\w.]+/anon.npr-podcasts[\w/-]*[.]mp3)", podcastPage )
 ##	if (g):
 ##		downloadNPRshow( g.group(1), thumbPathStr, showName )
@@ -118,6 +119,14 @@ def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
 	urlstream.close()
 	downloadNPRshow( nprParser.resultURL, thumbPathStr, showName )
 
+# Serial started using a CDN that's snotty about non-browser clients
+def urlOpenWithAgent(theurl):
+    uaStr = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
+    request = urllib2.Request(theurl)
+    request.add_header('User-Agent', uaStr )
+    opener = urllib2.build_opener()
+    return opener.open(request)
+
 # Well, actually, it turns out the .mp3 links are also buried in <DIV> tags.
 #  <div class="audio-player"
 #    data-id="381440789"
@@ -127,17 +136,17 @@ def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
 
 def getNPRShow( podCastID, thumbPathStr, showName ):
 	nprParser = NPRshowParser( "http.*[.]mp3$" )
-	urlstream = urllib.urlopen( "http://www.npr.org/podcasts/%s" % podCastID )
+	urlstream = urllib2.urlopen( "http://www.npr.org/podcasts/%s" % podCastID )
 	processNPRShow( nprParser, urlstream, thumbPathStr, showName )
 
 def getTAM( thumbPathStr ):
 	nprParser = NPRshowParser( "http.*[.]mp3$" )
-	urlstream = urllib.urlopen( "http://thisamericanlife.org/" )
+	urlstream = urllib2.urlopen( "http://thisamericanlife.org/" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
 
 def getSerial( thumbPathStr ):
 	nprParser = NPRshowParser( "http.*serial-s\d\d-e\d\d[.]mp3$" )
-	urlstream = urllib.urlopen( "http://serialpodcast.org/" )
+	urlstream = urlOpenWithAgent( "https://serialpodcast.org/" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "Serial Podcast" )
 
 def getFreak( thumbPathStr ):
@@ -145,13 +154,13 @@ def getFreak( thumbPathStr ):
 	# MP3 URL ends with ".../freakonomics_podcastMMDDYY.mp3"
 	# For now grab the first in the file (most recent)
 	nprParser = NPRshowParser( "http.*[.]mp3$" )
-	urlstream = urllib.urlopen( "http://feeds.feedburner.com/freakonomicsradio" )
+	urlstream = urllib2.urlopen( "http://feeds.feedburner.com/freakonomicsradio" )
 	processNPRShow( nprParser, urlstream, thumbPathStr, "Freakanomics Radio" )
 
 def getTAMepisode( showNumber ):
 	print "# Downloading TAM episode #%s" % showNumber
 	tamURL = "http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/%s.mp3"
-	mp3data = urllib.urlopen( tamURL % showNumber ).read()
+	mp3data = urllib2.urlopen( tamURL % showNumber ).read()
 	file( DestDrive + os.sep + "TAM"+ os.sep + "TAM_%s.mp3" % showNumber, 'wb' ).write( mp3data )
 
 #
@@ -179,7 +188,7 @@ def getPlanetMoney( lastCount, thumbPath ):
 			print "Already have Planet Money for %s" % moneyDateStr
 			return True
 
-		moneyMP3=urllib.urlopen( moneyURL )
+		moneyMP3=urllib2.urlopen( moneyURL )
 		if (moneyMP3.getcode() == 200):
 			print "Getting Planet Money for %s" % moneyDateStr
 			file( moneyPath, 'wb').write( moneyMP3.read() )
@@ -192,7 +201,7 @@ def getPlanetMoney( lastCount, thumbPath ):
 	# by date instead.
 
 	nprParser = NPRshowParser( ".*[.]mp3[?]dl=1$" )
-	urlstream = urllib.urlopen( "http://www.npr.org/blogs/money/")
+	urlstream = urllib2.urlopen( "http://www.npr.org/blogs/money/")
 	nprParser.feed( urlstream.read() )
 	urlstream.close()
 
@@ -223,8 +232,12 @@ def getMarketPlace():
 		else:
 			print d.strftime("Getting Marketplace for %b %d, %Y...")
 			showurl = genurl(d)
-			showMP3 = urllib.urlopen(showurl).read()
-			file( mktPath, 'wb' ).write(showMP3)
+			try:
+				showStream = urllib2.urlopen(showurl)
+				showMP3 = showStream.read()
+				file( mktPath, 'wb' ).write(showMP3)
+			except:
+				print d.strftime("Marketplace for %b %d, %Y is not available")
 
 	os.chdir(os.path.normpath("/"))    # So USB key isn't locked.
 
@@ -244,8 +257,8 @@ def getNPRShows():
 	getNPRShow( "510208", '/CARTALK/CT_%s.mp3', "Car Talk" )
 	getNPRShow( "344098539", '/WW/WW_%s.mp3', "Wait Wait" )
 ##	getNPRShow( "510307", '/INVIS/Invis_%s.mp3', "Invisibilia" )  # Season ended
-##	getSerial( '/TAM/Serial_%s.mp3' )						# Season ended
-#	getNPRShow( "510303", '/HT/HowTo_%s.mp3', "How To" )	# Boring
+	getSerial( '/TAM/Serial_%s.mp3' )
+##	getNPRShow( "510303", '/HT/HowTo_%s.mp3', "How To" )	# Boring
 	getTAM( '/TAM/TAM_%s.mp3' )
 	getMarketPlace()
 	getFreak( '/FNR/FNR_%s.mp3' )
