@@ -120,6 +120,7 @@ def processNPRShow( nprParser, urlstream, thumbPathStr, showName ):
 	downloadNPRshow( nprParser.resultURL, thumbPathStr, showName )
 
 # Serial started using a CDN that's snotty about non-browser clients
+# See http://www.diveintopython.net/http_web_services/user_agent.html
 def urlOpenWithAgent(theurl):
     uaStr = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
     request = urllib2.Request(theurl)
