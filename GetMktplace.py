@@ -38,12 +38,16 @@ class NPRshowParser( htmllib.HTMLParser ):
 	def __init__(self, hrefRegex):
 		self.resultURL = None
 		self.urlList = []
+		self.anchorClass = None
 		self.hrefRE = re.compile( hrefRegex )
 		htmllib.HTMLParser.__init__( self, formatter.NullFormatter() )
 
 	def start_a( self, attrs ):
 		d = dict(attrs)
 #		print d['href']
+		if (self.anchorClass):
+			if not d.has_key('class') or d['class'] != self.anchorClass:
+				return
 		if (d.has_key('href') and self.hrefRE.search( d['href'] )):
 			self.resultURL = d['href']
 			self.urlList.append( d['href'] )
@@ -136,7 +140,8 @@ def urlOpenWithAgent(theurl):
 # So we can fix the NPR parser to look for these DIV parameters.
 
 def getNPRShow( podCastID, thumbPathStr, showName ):
-	nprParser = NPRshowParser( "http.*[.]mp3$" )
+	nprParser = NPRshowParser( "http.*[.]mp3" )
+	nprParser.anchorClass = 'audio-module-listen'
 	urlstream = urllib2.urlopen( "http://www.npr.org/podcasts/%s" % podCastID )
 	processNPRShow( nprParser, urlstream, thumbPathStr, showName )
 
@@ -201,8 +206,8 @@ def getPlanetMoney( lastCount, thumbPath ):
 	# Rather than try and guess the URLs, we look for Planet Money shows
 	# by date instead.
 
-	nprParser = NPRshowParser( ".*[.]mp3[?]dl=1$" )
-	urlstream = urllib2.urlopen( "http://www.npr.org/blogs/money/")
+	nprParser = NPRshowParser( ".*[.]mp3.*[&]dl=1$" )
+	urlstream = urllib2.urlopen( "http://www.npr.org/sections/money/")
 	nprParser.feed( urlstream.read() )
 	urlstream.close()
 
@@ -256,7 +261,7 @@ def clean():
 # Weekly shows
 def getNPRShows():
 	getNPRShow( "510208", '/CARTALK/CT_%s.mp3', "Car Talk" )
-	getNPRShow( "344098539", '/WW/WW_%s.mp3', "Wait Wait" )
+##	getNPRShow( "344098539", '/WW/WW_%s.mp3', "Wait Wait" )  # Link broken
 ##	getNPRShow( "510307", '/INVIS/Invis_%s.mp3', "Invisibilia" )  # Season ended
 	getSerial( '/TAM/Serial_%s.mp3' )
 ##	getNPRShow( "510303", '/HT/HowTo_%s.mp3', "How To" )	# Boring
