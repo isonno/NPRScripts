@@ -44,12 +44,12 @@ class NPRshowParser( htmllib.HTMLParser ):
 
 	def start_a( self, attrs ):
 		d = dict(attrs)
-#		print d['href']
 		if (self.anchorClass):
 			if not d.has_key('class') or d['class'] != self.anchorClass:
 				return
 		if (d.has_key('href') and self.hrefRE.search( d['href'] )):
-			self.resultURL = d['href']
+			if (not self.resultURL):
+				self.resultURL = d['href']
 			self.urlList.append( d['href'] )
 
 		# This grabs archived shows from the Serial prodcast.
@@ -141,7 +141,7 @@ def urlOpenWithAgent(theurl):
 
 def getNPRShow( podCastID, thumbPathStr, showName ):
 	nprParser = NPRshowParser( "http.*[.]mp3" )
-	nprParser.anchorClass = 'audio-module-listen'
+#	nprParser.anchorClass = 'audio-module-listen'
 	urlstream = urllib2.urlopen( "http://www.npr.org/podcasts/%s" % podCastID )
 	processNPRShow( nprParser, urlstream, thumbPathStr, showName )
 
