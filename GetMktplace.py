@@ -148,7 +148,11 @@ def getNPRShow( podCastID, thumbPathStr, showName ):
 def getTAM( thumbPathStr ):
 	nprParser = NPRshowParser( "http.*[.]mp3$" )
 	urlstream = urllib2.urlopen( "http://thisamericanlife.org/" )
-	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
+#	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
+	nprParser.feed( urlstream.read() )
+	urlstream.close()
+	print nprParser.urlList[-1]
+	downloadNPRshow( nprParser.urlList[-1], thumbPathStr, "This American Life" )
 
 def getSerial( thumbPathStr ):
 	nprParser = NPRshowParser( "http.*serial-s\d\d-e\d\d[.]mp3$" )
@@ -299,7 +303,8 @@ def main():
 		reEncodeShow("HT")
 
 
-main()
+#main()
+getTAM( '/TAM/TAM_%s.mp3' )
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
