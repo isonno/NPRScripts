@@ -303,8 +303,7 @@ def main():
 		reEncodeShow("HT")
 
 
-#main()
-getTAM( '/TAM/TAM_%s.mp3' )
+main()
 
 # Note back issues of TAM are found here:
 # http://audio.thisamericanlife.org/jomamashouse/ismymamashouse/SHOWNUMBER.mp3
