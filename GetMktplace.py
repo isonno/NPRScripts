@@ -266,7 +266,7 @@ def clean():
 def getNPRShows():
 ##	getNPRShow( "510208", '/CARTALK/CT_%s.mp3', "Car Talk" )  # Tom Magliozzi, RIP
 	getNPRShow( "344098539", '/WW/WW_%s.mp3', "Wait Wait" )
-	getNPRShow( "510307", '/INVIS/Invis_%s.mp3', "Invisibilia" )  # Season ended
+##	getNPRShow( "510307", '/INVIS/Invis_%s.mp3', "Invisibilia" )  # Season ended
 ##	getSerial( '/TAM/Serial_%s.mp3' )        # Season 2 ended
 ##	getNPRShow( "510303", '/HT/HowTo_%s.mp3', "How To" )	# Boring
 	getTAM( '/TAM/TAM_%s.mp3' )
