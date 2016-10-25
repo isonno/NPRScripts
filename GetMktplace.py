@@ -151,8 +151,11 @@ def getTAM( thumbPathStr ):
 #	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
 	nprParser.feed( urlstream.read() )
 	urlstream.close()
-	print nprParser.urlList[-1]
-	downloadNPRshow( nprParser.urlList[-1], thumbPathStr, "This American Life" )
+	if len(nprParser.urlList) == 0:
+		print "# ERROR - .mp3 download link missing on TAM home page??"
+	else:
+		print nprParser.urlList[-1]
+		downloadNPRshow( nprParser.urlList[-1], thumbPathStr, "This American Life" )
 
 def getSerial( thumbPathStr ):
 	nprParser = NPRshowParser( "http.*serial-s\d\d-e\d\d[.]mp3$" )
@@ -252,7 +255,7 @@ def getMarketPlace():
 	os.chdir(os.path.normpath("/"))    # So USB key isn't locked.
 
 def clean():
-	folders = ["99PI", "ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "INVIS", "HT", "SCIFRI", "TAM", "TED", "WW"]
+	folders = ["99PI", "ATC", "CARTALK", "FAIR", "FNR", "MKTPLC", "INVIS", "HT", "GIM", "SCIFRI", "TAM", "TED", "WW"]
 	for fold in folders:
 		path = DestDrive + os.path.sep + fold + os.path.sep
 		if not os.path.exists( path ):
@@ -299,8 +302,8 @@ def main():
 		getTAMepisode( sys.argv[2] )
 	else:
 		getNPRShows()
-		reEncodeShow("WW")
-		reEncodeShow("HT")
+##		reEncodeShow("WW")
+##		reEncodeShow("HT")
 
 
 main()
