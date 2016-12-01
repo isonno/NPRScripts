@@ -142,12 +142,12 @@ def urlOpenWithAgent(theurl):
 def getNPRShow( podCastID, thumbPathStr, showName ):
 	nprParser = NPRshowParser( "http.*[.]mp3" )
 #	nprParser.anchorClass = 'audio-module-listen'
-	urlstream = urllib2.urlopen( "http://www.npr.org/podcasts/%s" % podCastID )
+	urlstream = urlOpenWithAgent( "http://www.npr.org/podcasts/%s" % podCastID )
 	processNPRShow( nprParser, urlstream, thumbPathStr, showName )
 
 def getTAM( thumbPathStr ):
 	nprParser = NPRshowParser( "http.*[.]mp3$" )
-	urlstream = urllib2.urlopen( "http://thisamericanlife.org/" )
+	urlstream = urlOpenWithAgent( "http://thisamericanlife.org/" )
 #	processNPRShow( nprParser, urlstream, thumbPathStr, "This American Life" )
 	nprParser.feed( urlstream.read() )
 	urlstream.close()
