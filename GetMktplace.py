@@ -20,17 +20,20 @@ def getWindowsDrives():		# http://stackoverflow.com/questions/827371
 	return drives
 
 DestDrive = None
-if sys.platform == "darwin":
-	DestDrive = "/Volumes/AUDIO"
-else:
-	winDrives = getWindowsDrives()[1:]	# Skip the C: drive
-	for d in winDrives:
-		if (os.path.exists( d + os.path.sep + "MKTPLC" )):
-			DestDrive = d
-			break
-	if (not DestDrive):
-		print "NPR Thumb drive missing?  It must have a MKTPLC folder"
-		sys.exit(-1)
+
+def setDestinationDrive():
+	global DestDrive
+	if sys.platform == "darwin":
+		DestDrive = "/Volumes/AUDIO"
+	else:
+		winDrives = getWindowsDrives()[1:]	# Skip the C: drive
+		for d in winDrives:
+			if (os.path.exists( d + os.path.sep + "MKTPLC" )):
+				DestDrive = d
+				break
+		if (not DestDrive):
+			print "NPR Thumb drive missing?  It must have a MKTPLC folder"
+			sys.exit(-1)
 
 # Walk through a web site, collecting anchors matching "hrefRegex"
 
@@ -214,7 +217,7 @@ def getPlanetMoney( lastCount, thumbPath ):
 	# by date instead.
 
 	nprParser = NPRshowParser( ".*[.]mp3.*[&]dl=1$" )
-	urlstream = urllib2.urlopen( "http://www.npr.org/sections/money/")
+	urlstream = urllib2.urlopen( "http://www.npr.org/podcasts/510289/planet-money/")
 	nprParser.feed( urlstream.read() )
 	urlstream.close()
 
@@ -275,10 +278,8 @@ def getNPRShows():
 	getTAM( '/TAM/TAM_%s.mp3' )
 	getMarketPlace()
 	getFreak( '/FNR/FNR_%s.mp3' )
-	getPlanetMoney( 1, "/ATC/Money_%s.mp3" )
-	getPlanetMoney( 2, "/ATC/Money_%s.mp3" )
-	getPlanetMoney( 3, "/ATC/Money_%s.mp3" )
-	getPlanetMoney( 4, "/ATC/Money_%s.mp3" )
+	for i in range(1,5):
+		getPlanetMoney( i, "/ATC/Money_%s.mp3" )
 
 # The MP3 Player on my '11 Honda Insight gags on some of
 # the podcast MP3 files NPR distributes.  Re-encoding
@@ -296,6 +297,7 @@ def reEncodeShow(show):
 		print "Unable to run ffmpeg"
 
 def main():
+	setDestinationDrive()
 	if (len(sys.argv) > 1 and sys.argv[1] == "clean"):
 		clean()
 	elif (len(sys.argv) > 2 and sys.argv[1] == "tam"):
@@ -304,7 +306,6 @@ def main():
 		getNPRShows()
 ##		reEncodeShow("WW")
 ##		reEncodeShow("HT")
-
 
 main()
 
