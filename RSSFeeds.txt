@@ -1,0 +1,18 @@
+# Sample feed folder.
+# Folder,MP3 filename base,RSS URL
+JS,JS,http://textfiles.libsyn.com/rss
+99PI,99PI,http://feeds.99percentinvisible.org/99percentinvisible?format=xml
+FNR,FNR,http://feeds.feedburner.com/freakonomicsradio?format=xml
+# NPR
+PM,PM,https://www.npr.org/rss/podcast.php?id=510289
+WW,WW,https://www.npr.org/rss/podcast.php?id=344098539
+INVIS,INVIS,https://www.npr.org/rss/podcast.php?id=510307
+RT,RT,https://www.npr.org/rss/podcast.php?id=510324
+MKTPLC,MKTPLC,https://feeds.publicradio.org/public_feeds/marketplace-pm/rss/rss
+TAM,SER,http://feeds.serialpodcast.org/serialpodcast?format=xml
+TAM,TAL,http://feed.thisamericanlife.org/talpodcast?format=xml
+# Gimlet
+GIM,REPALL,http://feeds.gimletmedia.com/hearreplyall?format=xml
+GIM,ELT,http://feeds.gimletmedia.com/eltshow?format=xml
+GIM,STARTUP,http://feeds.hearstartup.com/hearstartup?format=xml
+GIM,UNCIV,http://feeds.gimletmedia.com/uncivil?format=xml
