@@ -1,6 +1,8 @@
 NPRScripts
 ==========
 
+*UPDATE* - check out the new script, `PodcastWeek.py`. More details when, uh, I get a chance to work on it again.
+
 I like to listen to NPR podcasts in my car.  About once a week, I plug in a thumb drive to my PC and run this
 script, which gathers up shows I like and downloads them to the thumb drive.
 
