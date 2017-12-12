@@ -68,7 +68,7 @@ class Show:
     def download(self, base, folder):
         mp3url = self.data['enclosure_url']
         dstName = base + "_" + self.date.strftime("%d_%b_%y") + ".mp3"
-        dstpath = DestDrive + folder + os.sep + dstName
+        dstpath = DestDrive + os.sep + folder + os.sep + dstName
         if (os.path.exists(dstpath)):
             print "# Already have %s\n  (%s)" % (dstName, self.data['title'])
         else:
@@ -117,6 +117,9 @@ def setDestinationDrive():
 	global DestDrive
 	if sys.platform == "darwin":
 		DestDrive = "/Volumes/AUDIO"
+		if not os.path.exists(DestDrive):
+			print "Thumb drive %s not plugged in?" % DestDrive
+			sys.exit(-1)
 	else:
 		winDrives = getWindowsDrives()[1:]	# Skip the C: drive
 		for d in winDrives:
