@@ -71,11 +71,13 @@ class Show:
         dstpath = DestDrive + os.sep + folder + os.sep + dstName
         if (os.path.exists(dstpath)):
             print "# Already have %s\n  (%s)" % (dstName, self.data['title'])
-        else:
+        elif self.data['enclosure_url']:
             print "# Writing show %s\n  (%s)" % (dstName, self.data['title'])
             showStream = urllib2.urlopen(self.data['enclosure_url'])
             showMP3 = showStream.read()
             file(dstpath, 'wb').write(showMP3)
+        else:
+            print "# No MP3 available for (%s)" % self.data['title']
         
     # Debug
     def ShowKeys(self):
