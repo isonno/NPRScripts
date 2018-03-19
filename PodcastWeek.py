@@ -73,16 +73,20 @@ class Show:
             print "# Already have %s\n  (%s)" % (dstName, self.data['title'])
         elif self.data['enclosure_url']:
             print "# Writing show %s\n  (%s)" % (dstName, self.data['title'])
-            showStream = urllib2.urlopen(self.data['enclosure_url'])
-            showMP3 = showStream.read()
-            file(dstpath, 'wb').write(showMP3)
+            try:
+                showStream = urllib2.urlopen(self.data['enclosure_url'])
+                showMP3 = showStream.read()
+                file(dstpath, 'wb').write(showMP3)
+            except urllib2.URLError:
+                print "Re-direct??"
+                print "URL: " + self.data['enclosure_url']
         else:
             print "# No MP3 available for (%s)" % self.data['title']
-        
+
     # Debug
     def ShowKeys(self):
         print string.join([k for k in self.data.keys() if (self.data[k])], " : ")
-                
+
 # Podcast feed info
 class PodFeed:
     def __init__(self, dir, baseName, feedURL):
