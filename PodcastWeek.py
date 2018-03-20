@@ -77,9 +77,10 @@ class Show:
                 showStream = urllib2.urlopen(self.data['enclosure_url'])
                 showMP3 = showStream.read()
                 file(dstpath, 'wb').write(showMP3)
-            except urllib2.URLError:
-                print "Re-direct??"
-                print "URL: " + self.data['enclosure_url']
+            except urllib2.URLError as err:
+                print "### RE-DIRECT Failure?? %s" % str(err)
+                print "Original URL %s" % self.data['enclosure_url']
+                print "Redirect URL %s" % showStream.geturl()
         else:
             print "# No MP3 available for (%s)" % self.data['title']
 
