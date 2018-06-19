@@ -14,5 +14,5 @@ TAM,TAL,http://feed.thisamericanlife.org/talpodcast?format=xml
 # Gimlet
 GIM,REPALL,http://feeds.gimletmedia.com/hearreplyall?format=xml
 GIM,ELT,http://feeds.gimletmedia.com/eltshow?format=xml
-GIM,STARTUP,http://feeds.hearstartup.com/hearstartup?format=xml
+GIM,STARTUP,http://feeds.gimletmedia.com/hearstartup?format=xml
 GIM,UNCIV,http://feeds.gimletmedia.com/uncivil?format=xml

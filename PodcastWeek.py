@@ -94,8 +94,13 @@ class PodFeed:
         self.dir = dir
         self.url = feedURL
         self.baseName = baseName
+        xmltext = ""
+        try:
+            xmltext = urllib.urlopen( feedURL ).read()
+        except IOError:
+            print "Failed to read: %s" % feedURL
+            sys.exit(0)
 
-        xmltext = urllib.urlopen( feedURL ).read()
         xmldata = xml.parseString( xmltext )
         for k in ["title", "link", "description"]:
             self.__dict__[k] = getData(xmldata, k)
