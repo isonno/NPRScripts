@@ -73,6 +73,7 @@ class Show:
             print "# Already have %s\n  (%s)" % (dstName, self.data['title'])
         elif self.data['enclosure_url']:
             print "# Writing show %s\n  (%s)" % (dstName, self.data['title'])
+            showStream = None
             try:
                 showStream = urllib2.urlopen(self.data['enclosure_url'])
                 showMP3 = showStream.read()
@@ -80,7 +81,8 @@ class Show:
             except urllib2.URLError as err:
                 print "### RE-DIRECT Failure?? %s" % str(err)
                 print "Original URL %s" % self.data['enclosure_url']
-                print "Redirect URL %s" % showStream.geturl()
+                if (showStream):
+                    print "Redirect URL %s" % showStream.geturl()
         else:
             print "# No MP3 available for (%s)" % self.data['title']
 
