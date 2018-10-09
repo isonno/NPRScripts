@@ -69,10 +69,16 @@ class Show:
         mp3url = self.data['enclosure_url']
         dstName = base + "_" + self.date.strftime("%d_%b_%y") + ".mp3"
         dstpath = DestDrive + os.sep + folder + os.sep + dstName
-        if (os.path.exists(dstpath)):
-            print "# Already have %s\n  (%s)" % (dstName, self.data['title'])
-        elif self.data['enclosure_url']:
-            print "# Writing show %s\n  (%s)" % (dstName, self.data['title'])
+        dupe_count = 0
+        while (os.path.exists(dstpath) and dupe_count < 20):
+            print "# Already have %s" % dstName
+            dstpath = DestDrive + os.sep + folder + os.sep + ("%02d_" % dupe_count) + dstName
+            dupe_count += 1
+        if self.data['enclosure_url']:
+            if (dupe_count > 0):
+                print "# Writing show %s\n  (%s)" % (("%02d_" % dupe_count) + dstName, self.data['title'])
+            else:
+                print "# Writing show %s\n  (%s)" % (dstName, self.data['title'])
             showStream = None
             try:
                 showStream = urllib2.urlopen(self.data['enclosure_url'])
