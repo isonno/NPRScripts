@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Podacast week. Downloads a week's worth of podcasts onto a thumbdrive.
 #
