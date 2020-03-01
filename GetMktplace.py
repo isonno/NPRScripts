@@ -1,5 +1,7 @@
 #!/usr/bin/python
 #
+# THIS CODE IS DEPRECATED. Use PodcastWeek.py instead.
+#
 # For Python 2.7
 #
 # Fish the last four MarketPlace shows, and some weekly shows
