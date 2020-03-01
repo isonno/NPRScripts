@@ -1,7 +1,7 @@
-NPRScripts
-==========
+PodcastWeek
+===========
 
-Podacast week. Downloads a week's worth of podcasts onto a thumbdrive.
+This script downloads a week's worth of podcasts onto a thumbdrive.
 
 This uses a file in the same folder called "RSSFeeds.txt" to determine what gets loaded. This file is formatted like:
 ```
@@ -11,9 +11,7 @@ This uses a file in the same folder called "RSSFeeds.txt" to determine what gets
 # The last item is the RSS feed for the podcast.
 JS,JS,http://textfiles.libsyn.com/rss
 ```
-Checkout `RSSFeeds.txt` for an example I use. Lines starting with "#" are ignored.
-
-Usually if you google "Podcastname RSS" and look for a URL ending in `rss` or `xml`, that's it. 
+Checkout `RSSFeeds.txt` for an example I use. Lines starting with "#" are ignored. Usually if you google "Podcastname RSS" and look for a URL ending in `rss` or `xml`, that's it. 
 
 The script pulls up a feed, and downloads all shows with a pub date since the previous Saturday. If you update your thumb drive more often, you'll want to tweak this.
 
