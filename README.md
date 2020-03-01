@@ -17,6 +17,6 @@ The script pulls up a feed, and downloads all shows with a pub date since the pr
 
 NOTE
 ====
-I've stopped maintaining this for the time being. I now own a phone that works well enough with Android Auto that it's easier to use an app (such as Pocket Casts) to manage the podcasts. The screen interface for listening to MP3s in my Honda is so horrible it's worth the trouble to plug in the phone on every drive.
+I've stopped maintaining this for the time being. I now own a phone that works well enough with Android Auto that it's easier to use an app (such as Pocket Casts) to manage the podcasts. The screen interface for listening to MP3s in my Honda is so horrible it's worth the trouble to plug in the phone on every drive. Note the thumb drive must be labeled `AUDIO` (on the Mac) or have a folder at the root level called `MKTPLC` (for Windows) to be recognized by the script.
 
 It's still useful as a worked example of how to manage podcast feeds with Python, so feel free to loot the code for that.
